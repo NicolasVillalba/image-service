@@ -4,17 +4,20 @@ import org.poc.imageservice.domain.ImageAsset;
 import org.poc.imageservice.dtos.PathResponseDTO;
 import org.poc.imageservice.repositories.ImagesRepository;
 import org.poc.imageservice.services.StorageService;
+
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class ImagesController {
 
     private ImagesRepository images;
@@ -26,7 +29,7 @@ public class ImagesController {
         this.storageService = storageService;
     }
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public List<ImageAsset> getAll(){
         return images.findAll();
     }
@@ -37,7 +40,16 @@ public class ImagesController {
         ImageAsset asset = new ImageAsset();
         asset.setPath(imagePath);
         asset.setBelongsTo(0);
-        images.save(asset);
-        return ResponseEntity.status(HttpStatus.OK).body(new PathResponseDTO(imagePath));
+        String id =images.save(asset).getId();
+        return ResponseEntity.status(HttpStatus.OK).body(new PathResponseDTO(id));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable("id") String id) throws IOException {
+        //TODO: Warning:(49, 48) 'Optional.get()' without 'isPresent()' check
+        String imagePath = images.findById(id).get().getPath();
+        FileSystemResource fileSystemResources = new FileSystemResource("C:/Users/Public/Documents/" + imagePath);
+        byte[] bytes = StreamUtils.copyToByteArray(fileSystemResources.getInputStream());
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bytes);
     }
 }
