@@ -23,13 +23,13 @@ public class StorageService {
         try {
             name = sha.getSha1Digest(input.getInputStream());
             name = new StringJoiner("-").add(name).add(input.getOriginalFilename()).toString();
-            File file2 = new File("src/main/resources/static" + File.separator + name);
-            FileCopyUtils.copy(input.getInputStream(), new FileOutputStream(file2));
+            File file = new File("C:/Users/Public/Documents" + File.separator + name);
+            FileCopyUtils.copy(input.getInputStream(), new FileOutputStream(file));
 
         }catch (IOException e){
             throw new RuntimeException("Cause by: " + e.getStackTrace() + "--" + e.getMessage() + "--" + e.getClass());
         }
 
-        return path + name;
+        return name;
     }
 }
