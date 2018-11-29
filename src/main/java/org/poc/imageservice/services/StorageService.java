@@ -23,7 +23,7 @@ public class StorageService {
         try {
             name = sha.getSha1Digest(input.getInputStream());
             name = new StringJoiner("-").add(name).add(input.getOriginalFilename()).toString();
-            File file = new File("C:/Users/Public/Documents" + File.separator + name);
+            File file = new File(this.path + File.separator + name);
             FileCopyUtils.copy(input.getInputStream(), new FileOutputStream(file));
 
         }catch (IOException e){
