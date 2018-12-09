@@ -5,6 +5,7 @@ import org.poc.imageservice.dtos.PathResponseDTO;
 import org.poc.imageservice.repositories.ImagesRepository;
 import org.poc.imageservice.services.StorageService;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +24,9 @@ public class ImagesController {
     private ImagesRepository images;
 
     private StorageService storageService;
+
+    @Value("${images.path}")
+    private String folderPath;
 
     public ImagesController(ImagesRepository repository, StorageService storageService){
         this.images = repository;
@@ -48,7 +52,7 @@ public class ImagesController {
     public ResponseEntity<byte[]> getImage(@PathVariable("id") String id) throws IOException {
         //TODO: Warning:(49, 48) 'Optional.get()' without 'isPresent()' check
         String imagePath = images.findById(id).get().getPath();
-        FileSystemResource fileSystemResources = new FileSystemResource("C:/Users/Public/Documents/" + imagePath);
+        FileSystemResource fileSystemResources = new FileSystemResource( folderPath + imagePath);
         byte[] bytes = StreamUtils.copyToByteArray(fileSystemResources.getInputStream());
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(bytes);
     }
